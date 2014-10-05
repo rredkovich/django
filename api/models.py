@@ -11,6 +11,9 @@ class Restaurant(models.Model):
 	cuisine = models.CharField(max_length = 50)
 	eatingOptions = models.CharField(max_length = 50)
 	location = gis_models.PointField(u'Latitude/Longitude', geography=True, blank=True, null=True)
+	yelp_id = models.CharField(max_length=255,null=True)
+	foursquare_id = models.CharField(max_length=100, null=True)
+	foursquare_url = models.CharField(max_length=255,null=True)
 
 	# Query Manager
 	gis = gis_models.GeoManager()

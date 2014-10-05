@@ -48,6 +48,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.gis',
     'api',
+    'south',
 )
 
 MIDDLEWARE_CLASSES = (

@@ -49,6 +49,7 @@ INSTALLED_APPS = (
     'django.contrib.gis',
     'api',
     'south',
+    'social.apps.django_app.default',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -79,6 +80,27 @@ DATABASES = {
     }
 }
 
+# Python-social-auth section
+AUTHENTICATION_BACKENDS = (
+    'social.backends.facebook.FacebookOAuth2',
+    'social.backends.vk.VKOAuth2',
+)
+
+SOCIAL_AUTH_FACEBOOKOAUTH2_KEY = 'foobar'
+SOCIAL_AUTH_FACEBOOKOAUTH2_SECRET = 'bazqux'
+
+SOCIAL_AUTH_VK_OAUTH2_KEY = '4106318'
+SOCIAL_AUTH_VK_OAUTH2_SECRET = 'uCC5U2ssIXv4JMSFtgQH'
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'social.apps.django_app.context_processors.backends',
+    'social.apps.django_app.context_processors.login_redirect',
+    'django.contrib.auth.context_processors.auth',
+)
+
+SOCIAL_AUTH_ADMIN_USER_SEARCH_FIELDS = ['username', 'first_name']
+
+LOGIN_REDIRECT_URL = '/restaurant/01/comment'
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
 

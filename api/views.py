@@ -1,11 +1,14 @@
+import json
 from django.shortcuts import render
+from django.core.context_processors import csrf
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
 from django.core import serializers
-import json
+from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.gis import geos
 from django.contrib.gis import measure
 from geopy.distance import distance as geopy_distance
+from django.contrib.auth.decorators import login_required
 from api import models
 
 
@@ -46,3 +49,32 @@ def closest(request):
     	return getRestaurants(lon, lat)
     else:
     	return HttpResponse('Request method not correct')
+
+@login_required
+def comment(request, rest_pk):
+    if request.method == u'GET':
+        context = {}
+        context.update(csrf(request))
+        
+        try:
+            comment = models.Comment.objects.get(user=request.user)
+            context['comment_text'] = comment.text
+        except ObjectDoesNotExist:
+            pass
+
+        return render_to_response(request, 'comment.html', context)
+
+
+    if request.method == u'POST':
+        comment, is_created = models.Comment.objects.get_or_create(user=request.user)
+        comment.text = request.POST[u'text']
+        if is_created:
+            comment.user = request.user
+            comment.restaurant = Restaurant.objects.get(pk=rest_pk)
+        comment.save()
+
+# @login_required
+# def done(request):
+#     """Login complete view, displays user data"""
+#     return redirect('/garage')
+

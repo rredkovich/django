@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.gis.db import models as gis_models
 from django.contrib.gis import geos
 from django.db import models
+from social.apps.django_app.default.models import UserSocialAuth
 
 # Create your models here.
 class Restaurant(models.Model):
@@ -21,3 +22,8 @@ class Restaurant(models.Model):
 
 	def __unicode__(self):
 		return self.name
+
+class Comment(models.Model):
+	user = models.ForeignKey(UserSocialAuth)
+	restaurant = models.ForeignKey(Restaurant)
+	text = models.TextField(max_length=255)

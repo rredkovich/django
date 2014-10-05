@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, include, url
 
 from django.contrib.gis import admin
-from api.views import *
+import api.views as views
 
 admin.autodiscover()
 
@@ -11,5 +11,8 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^$', closest),
+    url(r'^$', views.closest),
+    url(r'^restaurants/(?P<rest_pk>[A-Z0-9]+)/comment/$', views.comment),
+    url(r'', include('social.apps.django_app.urls', namespace='social'))
 )
+

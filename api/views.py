@@ -57,6 +57,7 @@ def comment(request, rest_pk):
         context.update(csrf(request))
         
         try:
+            # also filter by restaurant pk
             comment = models.Comment.objects.get(user=request.user)
             context['comment_text'] = comment.text
         except ObjectDoesNotExist:

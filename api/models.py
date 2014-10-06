@@ -3,6 +3,7 @@ from django.contrib.gis.db import models as gis_models
 from django.contrib.gis import geos
 from django.db import models
 from social.apps.django_app.default.models import UserSocialAuth
+import datetime
 
 # Create your models here.
 class Restaurant(models.Model):
@@ -24,6 +25,8 @@ class Restaurant(models.Model):
 		return self.name
 
 class Comment(models.Model):
+	created_on = models.DateTimeField(auto_now_add=True)
+	modified_on = models.DateTimeField(auto_now=True)
 	user = models.ForeignKey(UserSocialAuth)
 	restaurant = models.ForeignKey(Restaurant)
 	text = models.TextField(max_length=255)

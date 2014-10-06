@@ -11,6 +11,9 @@ from geopy.distance import distance as geopy_distance
 from django.contrib.auth.decorators import login_required
 from api import models
 
+#TODO: remove from production
+from django.contrib.auth import logout
+
 
 # Create your views here.
 def getRestaurants(longitude, latitude):
@@ -52,30 +55,35 @@ def closest(request):
 
 @login_required
 def comment(request, rest_pk):
+    '''
+    rest_pk must be valid one for existing restaurant or 
+    ValueError will be raised on save() attempt in POST part. 
+    '''
+    context = {}
     if request.method == u'GET':
-        context = {}
-        context.update(csrf(request))
-        
         try:
-            # also filter by restaurant pk
-            comment = models.Comment.objects.get(user=request.user)
+            filterargs = { 'restaurant': rest_pk, 'user': request.user }
+            comment = models.Comment.objects.get(**filterargs)
             context['comment_text'] = comment.text
         except ObjectDoesNotExist:
             pass
 
-        return render_to_response(request, 'comment.html', context)
-
 
     if request.method == u'POST':
-        comment, is_created = models.Comment.objects.get_or_create(user=request.user)
-        comment.text = request.POST[u'text']
+        filterargs = { 'restaurant': rest_pk, 'user': request.user }
+        comment, is_created = models.Comment.objects.get_or_create(**filterargs)
+        comment.text = request.POST[u'comment']
         if is_created:
             comment.user = request.user
             comment.restaurant = Restaurant.objects.get(pk=rest_pk)
         comment.save()
+        context['comment_text'] = comment.text
 
-# @login_required
-# def done(request):
-#     """Login complete view, displays user data"""
-#     return redirect('/garage')
+    context.update(csrf(request))
+    return render_to_response('comment.html', context)
 
+#TODO: remove from production
+@login_required
+def log_out(request):
+    logout(request)
+    return render(request, "comment.html")

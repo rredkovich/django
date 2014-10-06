@@ -81,6 +81,7 @@ DATABASES = {
 }
 
 # Python-social-auth section
+# TODO: remove vk-oauth2 in production
 AUTHENTICATION_BACKENDS = (
     'social.backends.facebook.FacebookOAuth2',
     'social.backends.vk.VKOAuth2',
@@ -100,7 +101,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 SOCIAL_AUTH_ADMIN_USER_SEARCH_FIELDS = ['username', 'first_name']
 
-LOGIN_REDIRECT_URL = '/restaurant/01/comment'
+# TODO: change to facebook in production
+LOGIN_URL = '/login/vk-oauth2/'
+# LOGIN_REDIRECT_URL = '/restaurants/01/comment'
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
 
@@ -118,4 +121,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
+
 STATIC_URL = '/static/'
+
+TEMPLATE_DIRS = (
+    os.path.join(BASE_DIR, "/api/templates"),
+)

@@ -8,40 +8,14 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'Restaurant'
-        db.create_table(u'api_restaurant', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('address', self.gf('django.db.models.fields.CharField')(max_length=150)),
-            ('phone', self.gf('django.db.models.fields.CharField')(max_length=12)),
-            ('cuisine', self.gf('django.db.models.fields.CharField')(max_length=50)),
-            ('eatingOptions', self.gf('django.db.models.fields.CharField')(max_length=50)),
-            ('location', self.gf('django.contrib.gis.db.models.fields.PointField')(blank=True, null=True, geography=True)),
-            ('yelp_id', self.gf('django.db.models.fields.CharField')(max_length=255, null=True)),
-            ('foursquare_id', self.gf('django.db.models.fields.CharField')(max_length=100, null=True)),
-            ('foursquare_url', self.gf('django.db.models.fields.CharField')(max_length=255, null=True)),
-        ))
-        db.send_create_signal(u'api', ['Restaurant'])
 
-        # Adding model 'Comment'
-        db.create_table(u'api_comment', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('created_on', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('modified_on', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['default.UserSocialAuth'])),
-            ('restaurant', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['api.Restaurant'])),
-            ('text', self.gf('django.db.models.fields.TextField')(max_length=255)),
-        ))
-        db.send_create_signal(u'api', ['Comment'])
-
+        # Changing field 'Comment.user'
+        db.alter_column(u'api_comment', 'user_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User']))
 
     def backwards(self, orm):
-        # Deleting model 'Restaurant'
-        db.delete_table(u'api_restaurant')
 
-        # Deleting model 'Comment'
-        db.delete_table(u'api_comment')
-
+        # Changing field 'Comment.user'
+        db.alter_column(u'api_comment', 'user_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['default.UserSocialAuth']))
 
     models = {
         u'api.comment': {
@@ -51,7 +25,7 @@ class Migration(SchemaMigration):
             'modified_on': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'restaurant': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['api.Restaurant']"}),
             'text': ('django.db.models.fields.TextField', [], {'max_length': '255'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['default.UserSocialAuth']"})
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
         },
         u'api.restaurant': {
             'Meta': {'object_name': 'Restaurant'},
@@ -101,14 +75,6 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        },
-        u'default.usersocialauth': {
-            'Meta': {'unique_together': "(('provider', 'uid'),)", 'object_name': 'UserSocialAuth', 'db_table': "'social_auth_usersocialauth'"},
-            'extra_data': ('social.apps.django_app.default.fields.JSONField', [], {'default': "'{}'"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'provider': ('django.db.models.fields.CharField', [], {'max_length': '32'}),
-            'uid': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'social_auth'", 'to': u"orm['auth.User']"})
         }
     }
 

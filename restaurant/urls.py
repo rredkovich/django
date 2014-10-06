@@ -13,6 +13,9 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^$', views.closest),
     url(r'^restaurants/(?P<rest_pk>[A-Z0-9]+)/comment/$', views.comment),
-    url(r'', include('social.apps.django_app.urls', namespace='social'))
+    url(r'', include('social.apps.django_app.urls', namespace='social')),
+
+    #TODO: remove from production
+    url(r'^logout/$', views.log_out),
 )
 

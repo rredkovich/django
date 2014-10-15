@@ -1,8 +1,8 @@
-
 from django.conf.urls import patterns, include, url
 from django.conf.urls.static import static
 from django.contrib.gis import admin
 from django.conf import settings
+from django.views.generic import TemplateView
 
 import api.views as views
 
@@ -16,7 +16,13 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^$', views.closest),
     url(r'^restaurants/(?P<rest_pk>[A-Z0-9]+)/comment/$', views.comment),
+
+    #python-social-login urls
     url(r'', include('social.apps.django_app.urls', namespace='social')),
+
+    # pinax accounts urls
+    url(r"^owner/$", TemplateView.as_view(template_name="homepage.html"), name="home"),
+    url(r"^owner/account/", include("account.urls")),
 
     # url(r'^logout/$', views.log_out),
 )

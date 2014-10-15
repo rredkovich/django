@@ -51,6 +51,14 @@ INSTALLED_APPS = (
     'api',
     'south',
     'social.apps.django_app.default',
+    # pinax-account apps:
+    "ppacc",
+    "bootstrapform",
+    "pinax_theme_bootstrap",
+    "account",
+    "eventlog",
+    "metron",
+
 )
 
 MIDDLEWARE_CLASSES = (
@@ -88,6 +96,8 @@ POSTGIS_VERSION = (2, 1, 2)
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'social.backends.facebook.FacebookOAuth2',
+    'account.auth_backends.UsernameAuthenticationBackend',
+
 )
 
 #TODO Change in production
@@ -100,6 +110,14 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'social.apps.django_app.context_processors.login_redirect',
     'django.contrib.auth.context_processors.auth',
     'django.contrib.messages.context_processors.messages',
+    "account.context_processors.account",
+    "django.core.context_processors.debug",
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media",
+    "django.core.context_processors.static",
+    "django.core.context_processors.tz",
+    "django.core.context_processors.request",
+    "pinax_theme_bootstrap.context_processors.theme",
 )
 
 SOCIAL_AUTH_ADMIN_USER_SEARCH_FIELDS = ['username', 'first_name']
@@ -109,7 +127,28 @@ LOGIN_URL = '/login/facebook/'
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
 
-SESSION_COOKIE_DOMAIN = "128.199.176.172"
+# SESSION_COOKIE_DOMAIN = "128.199.176.172"
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'redkovich@gmail.com'
+EMAIL_HOST_PASSWORD = 'vkiofcumunkmixrj'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+FIXTURE_DIRS = [
+    os.path.join(BASE_DIR, "fixtures"),
+]
+
+print os.path.join(BASE_DIR, "ppacc/fixtures")
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+ACCOUNT_OPEN_SIGNUP = True
+ACCOUNT_EMAIL_UNIQUE = True
+ACCOUNT_EMAIL_CONFIRMATION_REQUIRED = True
+ACCOUNT_LOGIN_REDIRECT_URL = "home"
+ACCOUNT_LOGOUT_REDIRECT_URL = "home"
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 2
 
 LANGUAGE_CODE = 'en-us'
 

@@ -1,6 +1,9 @@
-from django.conf.urls import patterns, include, url
 
+from django.conf.urls import patterns, include, url
+from django.conf.urls.static import static
 from django.contrib.gis import admin
+from django.conf import settings
+
 import api.views as views
 
 admin.autodiscover()
@@ -15,7 +18,6 @@ urlpatterns = patterns('',
     url(r'^restaurants/(?P<rest_pk>[A-Z0-9]+)/comment/$', views.comment),
     url(r'', include('social.apps.django_app.urls', namespace='social')),
 
-    #TODO: remove from production
-    url(r'^logout/$', views.log_out),
+    # url(r'^logout/$', views.log_out),
 )
 

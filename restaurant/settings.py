@@ -26,6 +26,7 @@ ALLOWED_HOSTS = ['*']
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 
+#TODO Change in production
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '6+)idbqp^jvtw3q!*((=b)u9ba70)2p19#yoa4bc6zrvowl12r'
 
@@ -69,43 +70,46 @@ WSGI_APPLICATION = 'restaurant.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 
+#TODO Change in production
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'restaurant',
+        'NAME': 'postgres0',
         'USER': 'muhammadali',
-        'PASSWORD': 'postgres',
+        'PASSWORD': "postgres",
         'HOST': 'localhost',
         'PORT': 5432
     }
 }
 
+POSTGIS_VERSION = (2, 1, 2)
+
 # Python-social-auth section
-# TODO: remove vk-oauth2 in production
 AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
     'social.backends.facebook.FacebookOAuth2',
-    'social.backends.vk.VKOAuth2',
 )
 
-SOCIAL_AUTH_FACEBOOKOAUTH2_KEY = 'foobar'
-SOCIAL_AUTH_FACEBOOKOAUTH2_SECRET = 'bazqux'
+#TODO Change in production
+SOCIAL_AUTH_FACEBOOK_KEY = '338877252958705'
+SOCIAL_AUTH_FACEBOOK_SECRET = '104976a391991584da7dbd3fa192315f'
 
-SOCIAL_AUTH_VK_OAUTH2_KEY = '4106318'
-SOCIAL_AUTH_VK_OAUTH2_SECRET = 'uCC5U2ssIXv4JMSFtgQH'
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     'social.apps.django_app.context_processors.backends',
     'social.apps.django_app.context_processors.login_redirect',
     'django.contrib.auth.context_processors.auth',
+    'django.contrib.messages.context_processors.messages',
 )
 
 SOCIAL_AUTH_ADMIN_USER_SEARCH_FIELDS = ['username', 'first_name']
 
-# TODO: change to facebook in production
-LOGIN_URL = '/login/vk-oauth2/'
+LOGIN_URL = '/login/facebook/'
 # LOGIN_REDIRECT_URL = '/restaurants/01/comment'
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
+
+SESSION_COOKIE_DOMAIN = "128.199.176.172"
 
 LANGUAGE_CODE = 'en-us'
 
@@ -121,8 +125,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
-
+STATIC_ROOT = '/home/django/django_project/static'
+#STATIC_ROOT = ''
 STATIC_URL = '/static/'
+#STATICFILES_DIRS = ( os.path.join('static'),)
+#MEDIA_ROOT = '/home/django/django_project/static'
 
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, "/api/templates"),

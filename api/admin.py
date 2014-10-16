@@ -2,7 +2,7 @@ from django.contrib.gis import admin
 from api import models
 
 class RestaurantInOneLine(admin.GeoModelAdmin):
-    list_display = ('name', 'phone', 'yelp_id', 'yelp_url','foursquare_id','foursquare_url',)
+    list_display = ('name', 'id', 'phone', 'yelp_id', 'yelp_url','foursquare_id','foursquare_url',)
 
 class CommentInOneLine(admin.ModelAdmin):
     fields = (('restaurant', 'user'), 'text')

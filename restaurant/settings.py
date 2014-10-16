@@ -8,6 +8,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.6/ref/settings/
 """
 
+SITE_ID = 1
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 import dj_database_url
@@ -129,6 +131,7 @@ LOGIN_URL = '/login/facebook/'
 
 # SESSION_COOKIE_DOMAIN = "128.199.176.172"
 
+#TODO Change to actual smtp account for production
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'redkovich@gmail.com'
 EMAIL_HOST_PASSWORD = 'vkiofcumunkmixrj'

@@ -82,7 +82,7 @@ WSGI_APPLICATION = 'restaurant.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'postgres0',
+        'NAME': 'restaurant0',
         'USER': 'muhammadali',
         'PASSWORD': "postgres",
         'HOST': 'localhost',
@@ -138,8 +138,6 @@ EMAIL_USE_TLS = True
 FIXTURE_DIRS = [
     os.path.join(BASE_DIR, "fixtures"),
 ]
-
-print os.path.join(BASE_DIR, "ppacc/fixtures")
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 

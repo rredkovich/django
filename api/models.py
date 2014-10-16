@@ -14,10 +14,10 @@ class Restaurant(models.Model):
     cuisine = models.CharField(max_length = 50)
     eatingOptions = models.CharField(max_length = 50)
     location = gis_models.PointField(u'Latitude/Longitude', geography=True, blank=True, null=True)
-    yelp_id = models.CharField(max_length=255,null=True)
-    yelp_url = models.CharField(max_length=255, null=True)
-    foursquare_id = models.CharField(max_length=100, null=True)
-    foursquare_url = models.CharField(max_length=255,null=True)
+    yelp_id = models.CharField(max_length=255, blank=True)
+    yelp_url = models.CharField(max_length=255, blank=True)
+    foursquare_id = models.CharField(max_length=100, blank=True)
+    foursquare_url = models.CharField(max_length=255, blank=True)
 
     # Query Manager
     gis = gis_models.GeoManager()
@@ -31,4 +31,10 @@ class Comment(models.Model):
     modified_on = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User)
     restaurant = models.ForeignKey(Restaurant)
-    text = models.TextField(max_length=255)
+    text = models.TextField(max_length=255, blank=True)
+
+    def __unicode__(self):
+        return self.text[:25]
+
+    def short_text(self):
+        return self.__unicode__()

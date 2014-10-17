@@ -42,7 +42,7 @@ def getRestaurants(longitude, latitude):
         restaurant['fields']['lng'] = lng
         restaurant['fields']['lat'] = lat
 
-    return HttpResponse(json.dumps({"response":{"venues": data}}),  mimetype='application/json')
+    return HttpResponse(json.dumps({"response":{"total": len(data),"venues": data}}),  mimetype='application/json')
 
 def closest(request):
     restaurants = []
@@ -87,6 +87,20 @@ def comment(request, rest_pk):
 
     context.update(csrf(request))
     return render_to_response('comment.html', context)
+
+@login_required
+def show_all_comments(request, rest_pk):
+    context = {}
+    try:
+        rest = models.Restaurant.objects.get(id=rest_pk)
+    except ObjectDoesNotExist:
+        raise Http404
+
+    comments = models.Comment.objects.filter(restaurant=rest)
+    data = serializers.serialize('json', comments)
+    data = json.loads(data)
+    return HttpResponse(json.dumps({"response":{"total": len(data), "comments": data}}),  mimetype='application/json')
+
 
 # @login_required
 # def log_out(request):

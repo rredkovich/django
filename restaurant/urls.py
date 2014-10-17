@@ -15,7 +15,8 @@ urlpatterns = patterns('',
 
     url(r'^admin/', include(admin.site.urls)),
     url(r'^$', views.closest),
-    url(r'^restaurants/(?P<rest_pk>[A-Z0-9]+)/comment/$', views.comment),
+    url(r'^restaurants/(?P<rest_pk>[0-9]+)/comment/$', views.comment),
+    url(r'^restaurants/(?P<rest_pk>[0-9]+)/show-all-comments/$', views.show_all_comments),
 
     #python-social-login urls
     url(r'', include('social.apps.django_app.urls', namespace='social')),

@@ -90,7 +90,6 @@ def comment(request, rest_pk):
 
 @login_required
 def show_all_comments(request, rest_pk):
-    context = {}
     try:
         rest = models.Restaurant.objects.get(id=rest_pk)
     except ObjectDoesNotExist:

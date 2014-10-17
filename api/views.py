@@ -88,7 +88,6 @@ def comment(request, rest_pk):
     context.update(csrf(request))
     return render_to_response('comment.html', context)
 
-@login_required
 def show_all_comments(request, rest_pk):
     try:
         rest = models.Restaurant.objects.get(id=rest_pk)

@@ -2,13 +2,13 @@
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
 <html>
     <head>
-        <title>My Comment</title>
+        <title>My Tip</title>
     </head>
     <body>
         <form autocomplete="off" action="" method="post">{% csrf_token %}
           <p></p>
           <!-- <input type="hidden" name="restaurant" value=""> -->
-          <textarea type="text" name="comment" placeholder="Type your comment here">{{comment_text}}</textarea>
+          <textarea type="text" name="tip" placeholder="Type your tip here">{{tip_text}}</textarea>
           <br>
           <input type="submit" value="Submit">
         </form>

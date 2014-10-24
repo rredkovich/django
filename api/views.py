@@ -99,6 +99,50 @@ def show_all_comments(request, rest_pk):
     data = json.loads(data)
     return HttpResponse(json.dumps({"response":{"total": len(data), "comments": data}}),  mimetype='application/json')
 
+@login_required
+def tip(request, rest_pk):
+    '''
+    rest_pk must be valid one for existing restaurant or 
+    ValueError will be raised on save() attempt in POST part. 
+    '''
+    context = {}
+    try:
+        rest = models.Restaurant.objects.get(id=rest_pk)
+    except ObjectDoesNotExist:
+        raise Http404
+
+    if request.method == u'GET':
+        try:
+            filterargs = { 'restaurant': rest, 'user': request.user }
+            tip = models.Tip.objects.get(**filterargs)
+            context['tip_text'] = tip.text
+        except ObjectDoesNotExist:
+            pass
+
+
+    if request.method == u'POST':
+        filterargs = { 'restaurant': rest, 'user': request.user }
+        tip, is_created = models.Tip.objects.get_or_create(**filterargs)
+        tip.text = request.POST[u'tip']
+        if is_created:
+            tip.user = request.user
+            tip.restaurant = rest
+        tip.save()
+        context['tip_text'] = tip.text
+
+    context.update(csrf(request))
+    return render_to_response('tip.html', context)
+
+def show_all_tips(request, rest_pk):
+    try:
+        rest = models.Restaurant.objects.get(id=rest_pk)
+    except ObjectDoesNotExist:
+        raise Http404
+
+    tips = models.Comment.objects.filter(restaurant=rest)
+    data = serializers.serialize('json', tips)
+    data = json.loads(data)
+    return HttpResponse(json.dumps({"response":{"total": len(data), "tips": data}}),  mimetype='application/json')
 
 # @login_required
 # def log_out(request):

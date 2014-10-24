@@ -31,10 +31,20 @@ class Comment(models.Model):
     modified_on = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User)
     restaurant = models.ForeignKey(Restaurant)
-    text = models.TextField(max_length=255, blank=True)
+    text = models.TextField(blank=True)
 
     def __unicode__(self):
         return self.text[:25]
 
     def short_text(self):
         return self.__unicode__()
+
+class Tip(models.Model):
+    created_on = models.DateTimeField(auto_now_add=True)
+    modified_on = models.DateTimeField(auto_now=True)
+    user = models.ForeignKey(User)
+    restaurant = models.ForeignKey(Restaurant)
+    text = models.TextField(max_length=200, blank=True)
+
+    def __unicode__(self):
+        return self.text[:25]

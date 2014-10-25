@@ -139,7 +139,7 @@ def show_all_tips(request, rest_pk):
     except ObjectDoesNotExist:
         raise Http404
 
-    tips = models.Comment.objects.filter(restaurant=rest)
+    tips = models.Tip.objects.filter(restaurant=rest)
     data = serializers.serialize('json', tips)
     data = json.loads(data)
     return HttpResponse(json.dumps({"response":{"total": len(data), "tips": data}}),  mimetype='application/json')

@@ -8,7 +8,7 @@
         <form autocomplete="off" action="" method="post">{% csrf_token %}
           <p></p>
           <!-- <input type="hidden" name="restaurant" value=""> -->
-          <textarea type="text" name="comment" placeholder="Type your comment here">{{comment_text}}</textarea>
+          <textarea type="text" name="comment" placeholder="Type your comment here" required>{{comment_text}}</textarea>
           <br>
           <input type="submit" value="Submit">
         </form>

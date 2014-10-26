@@ -148,3 +148,28 @@ def show_all_tips(request, rest_pk):
 # def log_out(request):
 #     logout(request)
 #     return render(request, "comment.html")
+
+from django.contrib.auth import login
+
+from social.apps.django_app.utils import psa, load_strategy, load_backend
+
+# Define an URL entry to point to this view, call it passing the
+# access_token parameter like ?access_token=<token>. The URL entry must
+# contain the backend, like this:
+#
+#   url(r'^register-by-token/(?P<backend>[^/]+)/$',
+#       'register_by_access_token')
+
+@psa('social:complete')
+def register_by_access_token(request, backend):
+    # This view expects an access_token GET parameter, if it's needed,
+    # request.backend and request.strategy will be loaded with the current
+    # backend and strategy.
+    token = request.GET.get('access_token')
+    user = request.backend.do_auth(request.GET.get('access_token'))
+    if user:
+        login(request, user)
+        return HttpResponse(json.dumps({"success":True}), mimetype='application/json')
+    else:
+        return HttpResponse(json.dumps({"success":False}), mimetype='application/json')
+

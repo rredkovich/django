@@ -22,10 +22,12 @@ urlpatterns = patterns('',
 
     #python-social-login urls
     url(r'', include('social.apps.django_app.urls', namespace='social')),
+    url(r'^register-by-token/(?P<backend>[^/]+)/$', views.register_by_access_token),
 
     # pinax accounts urls
     url(r"^owner/$", TemplateView.as_view(template_name="homepage.html"), name="home"),
     url(r"^owner/account/", include("account.urls")),
+
 
     # url(r'^logout/$', views.log_out),
 )

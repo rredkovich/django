@@ -2,11 +2,15 @@ from django.db import models
 from django.contrib.gis.db import models as gis_models
 from django.contrib.gis import geos
 from django.db import models
-# from social.apps.django_app.default.models import UserSocialAuth
 from django.contrib.auth.models import User
 import datetime
 
-# Create your models here.
+class Category(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __unicode__(self):
+        return self.name
+
 class Restaurant(models.Model):
     name = models.CharField(max_length = 100)
     address = models.CharField(max_length = 150)
@@ -18,6 +22,8 @@ class Restaurant(models.Model):
     yelp_url = models.CharField(max_length=255, blank=True)
     foursquare_id = models.CharField(max_length=100, blank=True)
     foursquare_url = models.CharField(max_length=255, blank=True)
+
+    categories = models.ManyToManyField(Category)
 
     # Query Manager
     gis = gis_models.GeoManager()

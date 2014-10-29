@@ -11,4 +11,5 @@ class CommentInOneLine(admin.ModelAdmin):
 # Register your models here.
 admin.site.register(models.Restaurant, RestaurantInOneLine)
 admin.site.register(models.Comment, CommentInOneLine)
+admin.site.register(models.Category, admin.ModelAdmin)
 admin.site.register(models.Tip, admin.ModelAdmin)

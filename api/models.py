@@ -3,7 +3,10 @@ from django.contrib.gis.db import models as gis_models
 from django.contrib.gis import geos
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import RegexValidator, URLValidator
+
 import datetime
+
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
@@ -14,16 +17,35 @@ class Category(models.Model):
 class Restaurant(models.Model):
     name = models.CharField(max_length = 100)
     address = models.CharField(max_length = 150)
-    phone = models.CharField(max_length = 12)
+    phone = models.CharField(
+        max_length = 12, 
+        blank=True, 
+        validators=[
+            RegexValidator(
+                regex=r'^[0-9]+$', 
+                message='Only digits allowed'
+                )
+            ]
+    )
     cuisine = models.CharField(max_length = 50)
     eatingOptions = models.CharField(max_length = 50)
-    location = gis_models.PointField(u'Latitude/Longitude', geography=True, blank=True, null=True)
+    location = gis_models.PointField(
+        u'Latitude/Longitude', 
+        geography=True, 
+        blank=True, 
+        null=True
+    )
     yelp_id = models.CharField(max_length=255, blank=True)
-    yelp_url = models.CharField(max_length=255, blank=True)
+    yelp_url = models.CharField(max_length=255, blank=True, validators=[URLValidator()])
     foursquare_id = models.CharField(max_length=100, blank=True)
-    foursquare_url = models.CharField(max_length=255, blank=True)
+    foursquare_url = models.CharField(max_length=255, blank=True, validators=[URLValidator()])
 
     categories = models.ManyToManyField(Category)
+
+    # User can make changes in this model,
+    # look at views.update_restaurant()
+    modified_by = models.ForeignKey(User, null=True)
+    modified_on = models.DateTimeField(auto_now=True, null=True)
 
     # Query Manager
     gis = gis_models.GeoManager()

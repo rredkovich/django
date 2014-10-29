@@ -9,7 +9,9 @@ from django.contrib.gis import geos
 from django.contrib.gis import measure
 from geopy.distance import distance as geopy_distance
 from django.contrib.auth.decorators import login_required
-from api import models
+from django.contrib.auth import login
+from social.apps.django_app.utils import psa
+from api import models, forms
 
 # from django.contrib.auth import logout
 
@@ -144,21 +146,32 @@ def show_all_tips(request, rest_pk):
     data = json.loads(data)
     return HttpResponse(json.dumps({"response":{"total": len(data), "tips": data}}),  mimetype='application/json')
 
+@login_required
+def update_restaurant(request, rest_pk):
+    rest = models.Restaurant.objects.get(id=rest_pk)
+    if request.method == 'POST':
+        form = forms.RestaurantForm(request.POST, instance=rest) # A form bound to the POST data
+        if form.is_valid():
+            form.save()
+            # return HttpResponse(json.dumps({"success":True}),  mimetype='application/json')
+        else:
+            return render(request, 'update.html', {
+                'form': form,
+                'rest_pk': rest_pk,
+            })
+    else:
+        form = forms.RestaurantForm(instance=rest)
+
+    return render(request, 'update.html', {
+        'form': form,
+        'rest_pk': rest_pk,
+    })
+
 # @login_required
 # def log_out(request):
 #     logout(request)
 #     return render(request, "comment.html")
 
-from django.contrib.auth import login
-
-from social.apps.django_app.utils import psa, load_strategy, load_backend
-
-# Define an URL entry to point to this view, call it passing the
-# access_token parameter like ?access_token=<token>. The URL entry must
-# contain the backend, like this:
-#
-#   url(r'^register-by-token/(?P<backend>[^/]+)/$',
-#       'register_by_access_token')
 
 @psa('social:complete')
 def register_by_access_token(request, backend):

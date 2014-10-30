@@ -72,7 +72,9 @@ def comment(request, rest_pk):
         try:
             filterargs = { 'restaurant': rest, 'user': request.user }
             comment = models.Comment.objects.get(**filterargs)
-            context['comment_text'] = comment.text
+            context['text'] = comment.text
+            context['rating'] = comment.rating
+
         except ObjectDoesNotExist:
             pass
 
@@ -81,11 +83,14 @@ def comment(request, rest_pk):
         filterargs = { 'restaurant': rest, 'user': request.user }
         comment, is_created = models.Comment.objects.get_or_create(**filterargs)
         comment.text = request.POST[u'comment']
+        comment.rating = int(request.POST[u'rating'])
         if is_created:
             comment.user = request.user
             comment.restaurant = rest
         comment.save()
-        context['comment_text'] = comment.text
+        context['text'] = comment.text
+        context['rating'] = comment.rating
+        rest.update_avg_rating()
 
     context.update(csrf(request))
     return render_to_response('comment.html', context)

@@ -60,7 +60,6 @@ INSTALLED_APPS = (
     "account",
     "eventlog",
     "metron",
-
 )
 
 MIDDLEWARE_CLASSES = (

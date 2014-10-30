@@ -41,6 +41,7 @@ class Restaurant(models.Model):
     foursquare_url = models.CharField(max_length=255, blank=True, validators=[URLValidator()])
 
     categories = models.ManyToManyField(Category)
+    avg_rating = models.DecimalField(max_digits=3, decimal_places=2, null=True)
 
     # User can make changes in this model,
     # look at views.update_restaurant()
@@ -54,11 +55,24 @@ class Restaurant(models.Model):
     def __unicode__(self):
         return self.name
 
+    def update_avg_rating(self):
+        self_comments = Comment.objects.filter(restaurant = self)
+        num_of_comments = float(len(self_comments))
+        if num_of_comments == 0.0:
+            return
+        avg_rating = 0.0
+        for comment in self_comments:
+            avg_rating += comment.rating / num_of_comments
+        self.avg_rating = avg_rating
+        self.save()
+
+
 class Comment(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     modified_on = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User)
     restaurant = models.ForeignKey(Restaurant)
+    rating = models.IntegerField(null=True, blank=True)
     text = models.TextField(blank=True)
 
     def __unicode__(self):

@@ -7,8 +7,14 @@
     <body>
         <form autocomplete="off" action="" method="post">{% csrf_token %}
           <p></p>
-          <!-- <input type="hidden" name="restaurant" value=""> -->
-          <textarea type="text" name="comment" placeholder="Type your comment here" required>{{comment_text}}</textarea>
+              Rating <br> 
+            <input type="radio" name="rating" value="1"{% if rating == 1 %} checked {% endif %} required> 1
+            <input type="radio" name="rating" value="2"{% if rating == 2 %} checked {% endif %}> 2
+            <input type="radio" name="rating" value="3"{% if rating == 3 %} checked {% endif %}> 3
+            <input type="radio" name="rating" value="4"{% if rating == 4 %} checked {% endif %}> 4
+            <input type="radio" name="rating" value="5"{% if rating == 5 %} checked {% endif %}> 5
+          <p></p>
+          <textarea type="text" name="comment" placeholder="Type your comment here" required>{{text}}</textarea>
           <br>
           <input type="submit" value="Submit">
         </form>

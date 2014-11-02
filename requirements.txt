@@ -34,7 +34,6 @@ python-social-auth==0.2.1
 south==1.0.0
 
 #Pinax-project-account section
-
 pinax-theme-bootstrap==5.5.1
 django-user-accounts==1.0c9
 metron==1.3.1

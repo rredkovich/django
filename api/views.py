@@ -9,7 +9,9 @@ from django.contrib.gis import geos
 from django.contrib.gis import measure
 from geopy.distance import distance as geopy_distance
 from django.contrib.auth.decorators import login_required
-from api import models
+from django.contrib.auth import login
+from social.apps.django_app.utils import psa
+from api import models, forms
 
 # from django.contrib.auth import logout
 
@@ -70,7 +72,9 @@ def comment(request, rest_pk):
         try:
             filterargs = { 'restaurant': rest, 'user': request.user }
             comment = models.Comment.objects.get(**filterargs)
-            context['comment_text'] = comment.text
+            context['text'] = comment.text
+            context['rating'] = comment.rating
+
         except ObjectDoesNotExist:
             pass
 
@@ -79,11 +83,14 @@ def comment(request, rest_pk):
         filterargs = { 'restaurant': rest, 'user': request.user }
         comment, is_created = models.Comment.objects.get_or_create(**filterargs)
         comment.text = request.POST[u'comment']
+        comment.rating = int(request.POST[u'rating'])
         if is_created:
             comment.user = request.user
             comment.restaurant = rest
         comment.save()
-        context['comment_text'] = comment.text
+        context['text'] = comment.text
+        context['rating'] = comment.rating
+        rest.update_avg_rating()
 
     context.update(csrf(request))
     return render_to_response('comment.html', context)
@@ -99,8 +106,88 @@ def show_all_comments(request, rest_pk):
     data = json.loads(data)
     return HttpResponse(json.dumps({"response":{"total": len(data), "comments": data}}),  mimetype='application/json')
 
+@login_required
+def tip(request, rest_pk):
+    '''
+    rest_pk must be valid one for existing restaurant or 
+    ValueError will be raised on save() attempt in POST part. 
+    '''
+    context = {}
+    try:
+        rest = models.Restaurant.objects.get(id=rest_pk)
+    except ObjectDoesNotExist:
+        raise Http404
+
+    if request.method == u'GET':
+        try:
+            filterargs = { 'restaurant': rest, 'user': request.user }
+            tip = models.Tip.objects.get(**filterargs)
+            context['tip_text'] = tip.text
+        except ObjectDoesNotExist:
+            pass
+
+
+    if request.method == u'POST':
+        filterargs = { 'restaurant': rest, 'user': request.user }
+        tip, is_created = models.Tip.objects.get_or_create(**filterargs)
+        tip.text = request.POST[u'tip']
+        if is_created:
+            tip.user = request.user
+            tip.restaurant = rest
+        tip.save()
+        context['tip_text'] = tip.text
+
+    context.update(csrf(request))
+    return render_to_response('tip.html', context)
+
+def show_all_tips(request, rest_pk):
+    try:
+        rest = models.Restaurant.objects.get(id=rest_pk)
+    except ObjectDoesNotExist:
+        raise Http404
+
+    tips = models.Tip.objects.filter(restaurant=rest)
+    data = serializers.serialize('json', tips)
+    data = json.loads(data)
+    return HttpResponse(json.dumps({"response":{"total": len(data), "tips": data}}),  mimetype='application/json')
+
+@login_required
+def update_restaurant(request, rest_pk):
+    rest = models.Restaurant.objects.get(id=rest_pk)
+    if request.method == 'POST':
+        form = forms.RestaurantForm(request.POST, instance=rest) # A form bound to the POST data
+        if form.is_valid():
+            form.save()
+            # return HttpResponse(json.dumps({"success":True}),  mimetype='application/json')
+        else:
+            return render(request, 'update.html', {
+                'form': form,
+                'rest_pk': rest_pk,
+            })
+    else:
+        form = forms.RestaurantForm(instance=rest)
+
+    return render(request, 'update.html', {
+        'form': form,
+        'rest_pk': rest_pk,
+    })
 
 # @login_required
 # def log_out(request):
 #     logout(request)
 #     return render(request, "comment.html")
+
+
+@psa('social:complete')
+def register_by_access_token(request, backend):
+    # This view expects an access_token GET parameter, if it's needed,
+    # request.backend and request.strategy will be loaded with the current
+    # backend and strategy.
+    token = request.GET.get('access_token')
+    user = request.backend.do_auth(request.GET.get('access_token'))
+    if user:
+        login(request, user)
+        return HttpResponse(json.dumps({"success":True}), mimetype='application/json')
+    else:
+        return HttpResponse(json.dumps({"success":False}), mimetype='application/json')
+

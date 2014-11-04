@@ -29,8 +29,6 @@ urlpatterns = patterns('',
     url(r"^owner/$", TemplateView.as_view(template_name="homepage.html"), name="home"),
     url(r"^owner/account/", include("account.urls")),
 
-    url(r'^review/', include('review.urls')),
-
     # url(r'^logout/$', views.log_out),
 )
 

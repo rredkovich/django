@@ -15,16 +15,23 @@ from api import models, forms
 
 # from django.contrib.auth import logout
 
-
-# Create your views here.
-def getRestaurants(longitude, latitude):
+def getRestaurants(longitude, latitude, categories):
     currentPoint = geos.GEOSGeometry('POINT(%s %s)' %(longitude, latitude))
-    distance_m = 5000
-    restaurants = models.Restaurant.gis.filter(location__distance_lte=(currentPoint, distance_m))
-    restaurants = restaurants.distance(currentPoint).order_by('distance')
-
-    # Removing your own self from the list.
-    restaurants = restaurants[1:]
+    distance_m = 15000
+    list_of_cats = []
+    for c in categories:
+        list_of_cats.append(models.Category.objects.get(name=c))
+    if list_of_cats:
+        restaurants = models.Restaurant.gis.filter(
+            location__distance_lte=(currentPoint, distance_m), 
+            categories__in=list_of_cats
+            )
+    else:
+        restaurants = models.Restaurant.gis.filter(location__distance_lte=(currentPoint, distance_m))
+    
+    # seems that this thing doesn't actually order objects by distance
+    # btw at this step there is no distance property in objects or rows in table
+    # restaurants = restaurants.distance(currentPoint).order_by('distance')
 
     # String based JSON
     data = serializers.serialize('json', restaurants)
@@ -33,8 +40,7 @@ def getRestaurants(longitude, latitude):
 
     for restaurant in data:
         d = geopy_distance(currentPoint, restaurant['fields']['location']).kilometers
-        d = round(d, 2)
-        restaurant['fields']['distance'] = d
+        restaurant['fields']['distance'] = round(d, 2)
 
         # Fancy splitting on POINT(lon, lat)
         lng = restaurant['fields']['location'].split()[1][1:]
@@ -44,7 +50,15 @@ def getRestaurants(longitude, latitude):
         restaurant['fields']['lng'] = lng
         restaurant['fields']['lat'] = lat
 
-    return HttpResponse(json.dumps({"response":{"total": len(data),"venues": data}}),  mimetype='application/json')
+    return HttpResponse(
+        json.dumps({
+            "response":{
+                "total": len(data),
+                "venues": sorted(data, key = lambda rest: rest['fields']['distance'])
+            }
+        }),  
+        content_type='application/json'
+    )
 
 def closest(request):
     restaurants = []
@@ -52,7 +66,11 @@ def closest(request):
         
         lat = float(request.GET['lat'])
         lon = float(request.GET['lon'])
-        return getRestaurants(lon, lat)
+        if 'category' in request.GET:
+            categories = request.GET['category'].split('+')
+        else:
+            categories = []
+        return getRestaurants(lon, lat, categories)
     else:
         return HttpResponse('Request method not correct')
 
@@ -104,7 +122,7 @@ def show_all_comments(request, rest_pk):
     comments = models.Comment.objects.filter(restaurant=rest)
     data = serializers.serialize('json', comments)
     data = json.loads(data)
-    return HttpResponse(json.dumps({"response":{"total": len(data), "comments": data}}),  mimetype='application/json')
+    return HttpResponse(json.dumps({"response":{"total": len(data), "comments": data}}),  content_type='application/json')
 
 @login_required
 def tip(request, rest_pk):
@@ -149,7 +167,7 @@ def show_all_tips(request, rest_pk):
     tips = models.Tip.objects.filter(restaurant=rest)
     data = serializers.serialize('json', tips)
     data = json.loads(data)
-    return HttpResponse(json.dumps({"response":{"total": len(data), "tips": data}}),  mimetype='application/json')
+    return HttpResponse(json.dumps({"response":{"total": len(data), "tips": data}}),  content_type='application/json')
 
 @login_required
 def update_restaurant(request, rest_pk):
@@ -158,7 +176,7 @@ def update_restaurant(request, rest_pk):
         form = forms.RestaurantForm(request.POST, instance=rest) # A form bound to the POST data
         if form.is_valid():
             form.save()
-            # return HttpResponse(json.dumps({"success":True}),  mimetype='application/json')
+            # return HttpResponse(json.dumps({"success":True}),  content_type='application/json')
         else:
             return render(request, 'update.html', {
                 'form': form,
@@ -187,7 +205,7 @@ def register_by_access_token(request, backend):
     user = request.backend.do_auth(request.GET.get('access_token'))
     if user:
         login(request, user)
-        return HttpResponse(json.dumps({"success":True}), mimetype='application/json')
+        return HttpResponse(json.dumps({"success":True}), content_type='application/json')
     else:
-        return HttpResponse(json.dumps({"success":False}), mimetype='application/json')
+        return HttpResponse(json.dumps({"success":False}), content_type='application/json')
 

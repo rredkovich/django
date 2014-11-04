@@ -45,7 +45,7 @@ class Restaurant(models.Model):
 
     # User can make changes in this model,
     # look at views.update_restaurant()
-    modified_by = models.ForeignKey(User, null=True)
+    modified_by = models.ForeignKey(User, null=True, blank=True)
     modified_on = models.DateTimeField(auto_now=True, null=True)
 
     # Query Manager

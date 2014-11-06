@@ -1,4 +1,7 @@
 <form action="/restaurants/{{rest_pk}}/update/" method="post">{% csrf_token %}
 {{ form.as_p }}
 <input type="submit" value="Submit" />
+{% if is_saved %}
+<font color="green">&#10004;</font> Saved
+{% endif %}
 </form>

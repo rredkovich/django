@@ -15,7 +15,7 @@ from api import models, forms
 
 # from django.contrib.auth import logout
 
-def getRestaurants(longitude, latitude, categories):
+def get_restaurants(longitude, latitude, categories):
     currentPoint = geos.GEOSGeometry('POINT(%s %s)' %(longitude, latitude))
     distance_m = 15000
     list_of_cats = []
@@ -38,6 +38,12 @@ def getRestaurants(longitude, latitude, categories):
     # Actual JSON object to be edited
     data = json.loads(data)
 
+    # if venue has multiple categories and some of them
+    # are in list_of_cats than venue will appear in data that some times
+    # so we will uniqify venues in data
+    if len(list_of_cats) > 1:
+        data = {v['pk']:v for v in data}.values()
+
     for restaurant in data:
         d = geopy_distance(currentPoint, restaurant['fields']['location']).kilometers
         restaurant['fields']['distance'] = round(d, 2)
@@ -49,6 +55,13 @@ def getRestaurants(longitude, latitude, categories):
         del restaurant['fields']['location']
         restaurant['fields']['lng'] = lng
         restaurant['fields']['lat'] = lat
+
+        # Replace category ids with names
+        cat_names = []
+        for cat_id in restaurant['fields']['categories']:
+            cat = models.Category.objects.get(id=cat_id)
+            cat_names.append(cat.name)
+        restaurant['fields']['categories'] = cat_names
 
     return HttpResponse(
         json.dumps({
@@ -70,7 +83,7 @@ def closest(request):
             categories = request.GET['category'].split('+')
         else:
             categories = []
-        return getRestaurants(lon, lat, categories)
+        return get_restaurants(lon, lat, categories)
     else:
         return HttpResponse('Request method not correct')
 
@@ -108,6 +121,7 @@ def comment(request, rest_pk):
         comment.save()
         context['text'] = comment.text
         context['rating'] = comment.rating
+        context['is_saved'] = True
         rest.update_avg_rating()
 
     context.update(csrf(request))
@@ -154,6 +168,7 @@ def tip(request, rest_pk):
             tip.restaurant = rest
         tip.save()
         context['tip_text'] = tip.text
+        context['is_saved'] = True
 
     context.update(csrf(request))
     return render_to_response('tip.html', context)
@@ -172,23 +187,21 @@ def show_all_tips(request, rest_pk):
 @login_required
 def update_restaurant(request, rest_pk):
     rest = models.Restaurant.objects.get(id=rest_pk)
+
+    context = {'rest_pk': rest_pk}
+
     if request.method == 'POST':
         form = forms.RestaurantForm(request.POST, instance=rest) # A form bound to the POST data
         if form.is_valid():
             form.save()
-            # return HttpResponse(json.dumps({"success":True}),  content_type='application/json')
-        else:
-            return render(request, 'update.html', {
-                'form': form,
-                'rest_pk': rest_pk,
-            })
+            context['is_saved'] = True
+        
+        context['form'] = form
+    
     else:
-        form = forms.RestaurantForm(instance=rest)
+        context['form'] = forms.RestaurantForm(instance=rest)
 
-    return render(request, 'update.html', {
-        'form': form,
-        'rest_pk': rest_pk,
-    })
+    return render(request, 'update.html', context)
 
 # @login_required
 # def log_out(request):

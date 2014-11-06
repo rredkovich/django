@@ -11,6 +11,9 @@
           <textarea type="text" name="tip" placeholder="Type your tip here">{{tip_text}}</textarea>
           <br>
           <input type="submit" value="Submit">
+          {% if is_saved %}
+          <font color="green">&#10004;</font> Saved
+          {% endif %}
         </form>
     </body>
 </html>

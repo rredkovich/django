@@ -16,7 +16,10 @@
           <p></p>
           <textarea type="text" name="comment" placeholder="Type your comment here" required>{{text}}</textarea>
           <br>
-          <input type="submit" value="Submit">
+          <input type="submit" value="Submit"> 
+          {% if is_saved %}
+          <font color="green">&#10004;</font> Saved
+          {% endif %}
         </form>
     </body>
 </html>

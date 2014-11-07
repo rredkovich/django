@@ -40,12 +40,12 @@ class Restaurant(models.Model):
     foursquare_id = models.CharField(max_length=100, blank=True)
     foursquare_url = models.CharField(max_length=255, blank=True, validators=[URLValidator()])
 
-    categories = models.ManyToManyField(Category)
-    avg_rating = models.DecimalField(max_digits=3, decimal_places=2, null=True)
+    categories = models.ManyToManyField(Category, null=True)
+    avg_rating = models.DecimalField(max_digits=3, decimal_places=2, null=True, blank=True)
 
     # User can make changes in this model,
     # look at views.update_restaurant()
-    modified_by = models.ForeignKey(User, null=True)
+    modified_by = models.ForeignKey(User, null=True, blank=True)
     modified_on = models.DateTimeField(auto_now=True, null=True)
 
     # Query Manager

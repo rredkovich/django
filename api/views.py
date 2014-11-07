@@ -16,6 +16,16 @@ from api import models, forms
 # from django.contrib.auth import logout
 
 def get_restaurants(longitude, latitude, categories):
+    '''
+    Returns objects at given point that satisfy set of categories, 
+    or all of them if categories is empty.
+    input:
+        str longitude
+        str latitude
+        list categories
+    output:
+        list of dicts
+    '''
     currentPoint = geos.GEOSGeometry('POINT(%s %s)' %(longitude, latitude))
     distance_m = 15000
     list_of_cats = []
@@ -63,18 +73,12 @@ def get_restaurants(longitude, latitude, categories):
             cat_names.append(cat.name)
         restaurant['fields']['categories'] = cat_names
 
-    return HttpResponse(
-        json.dumps({
-            "response":{
-                "total": len(data),
-                "venues": sorted(data, key = lambda rest: rest['fields']['distance'])
-            }
-        }),  
-        content_type='application/json'
-    )
+    return data
+    
+
+# "No restaurants for this categories, here are some other ones you might like"
 
 def closest(request):
-    restaurants = []
     if request.method == 'GET' and 'lat' in request.GET and 'lon' in request.GET:
         
         lat = float(request.GET['lat'])
@@ -83,7 +87,25 @@ def closest(request):
             categories = request.GET['category'].split('+')
         else:
             categories = []
-        return get_restaurants(lon, lat, categories)
+
+        response_message = ''
+        restaurants = get_restaurants(lon, lat, categories)
+        
+        if not restaurants:
+            restaurants = get_restaurants(lon, lat, categories=[])
+            response_message = "No restaurants for this categories, here are some other ones you might like"
+
+
+        return HttpResponse(
+            json.dumps({
+                "response":{
+                    "total": len(restaurants),
+                    "venues": sorted(restaurants, key = lambda rest: rest['fields']['distance']),
+                    "message": response_message
+                }
+            }),  
+            content_type='application/json'
+        )
     else:
         return HttpResponse('Request method not correct')
 

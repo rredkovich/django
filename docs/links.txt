@@ -1,0 +1,32 @@
+# Admin account
+/admin/
+
+# API link, usage:
+# for all venues on location
+# GET /?lat=-35.3321935&lon=149.1524974
+# for venues in some_category
+# GET /?lat=-35.3321935&lon=149.1524974&category=Cafe
+# or in more than one category
+# GET /?lat=-35.3321935&lon=149.1524974&category=Cafe%2BMiddle+Eastern
+/
+
+# Webpage link for adding a review (comment), facebook login will be asked
+restaurants/__rest_id__/comment/
+restaurants/__rest_id__/show-all-comments/
+
+# Webpage link for adding a tip (comment), facebook login will be asked
+restaurants/__rest_id__/tip/
+restaurants/__rest_id__/show-all-tips/
+
+# Webpage link for make changes in a venue
+restaurants/__rest_id__/update/
+
+# python-social-login urls
+# GET register-by-token/facebook/?access_token=__token__
+# returns sessionid cookie which should be used for future 
+# API requests with auth check
+register-by-token/facebook/
+
+# pinax accounts urls
+owner/
+owner/account/

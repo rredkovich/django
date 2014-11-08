@@ -1,0 +1,19 @@
+# creating new db (postgres user)
+createdb restaurant1 --owner=muhammadali --locale=en_US.UTF-8 --encoding="UTF-8" --template=template0
+
+psql restaurant1
+    CREATE EXTENSION postgis;
+    CREATE EXTENSION postgis_topology;
+
+    GRANT ALL ON ALL TABLES IN SCHEMA public TO muhammadali;
+
+# initial setup (usual user)
+manage.py shemamigration api --initial
+manage.py syncdb
+manage.py migrate api
+manage.py migrate social.apps.django_app.default
+manage.py collectstatic
+
+# adding venues from outer source
+manage.py shell < fill_db_with_cats_02.11.py 
+manage.py shell < fill_db_02_11.py

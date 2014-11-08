@@ -56,7 +56,7 @@ def get_restaurants(longitude, latitude, categories):
 
     for restaurant in data:
         d = geopy_distance(currentPoint, restaurant['fields']['location']).kilometers
-        restaurant['fields']['distance'] = round(d, 2)
+        restaurant['fields']['distance'] = round(d, 1)
 
         # Fancy splitting on POINT(lon, lat)
         lng = restaurant['fields']['location'].split()[1][1:]
@@ -74,9 +74,6 @@ def get_restaurants(longitude, latitude, categories):
         restaurant['fields']['categories'] = cat_names
 
     return data
-    
-
-# "No restaurants for this categories, here are some other ones you might like"
 
 def closest(request):
     if request.method == 'GET' and 'lat' in request.GET and 'lon' in request.GET:

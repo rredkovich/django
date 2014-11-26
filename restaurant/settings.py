@@ -83,7 +83,7 @@ WSGI_APPLICATION = 'restaurant.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'restaurant0',
+        'NAME': 'restaurant2',
         'USER': 'muhammadali',
         'PASSWORD': "postgres",
         'HOST': 'localhost',

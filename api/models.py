@@ -14,7 +14,11 @@ class Category(models.Model):
     def __unicode__(self):
         return self.name
 
-class Restaurant(models.Model):
+
+class Venue(models.Model):
+    '''
+    General model for venues.
+    '''
     name = models.CharField(max_length = 100)
     address = models.CharField(max_length = 150)
     phone = models.CharField(
@@ -27,24 +31,16 @@ class Restaurant(models.Model):
                 )
             ]
     )
-    cuisine = models.CharField(max_length = 50)
-    eatingOptions = models.CharField(max_length = 50)
     location = gis_models.PointField(
         u'Latitude/Longitude', 
         geography=True, 
         blank=True, 
         null=True
     )
-    yelp_id = models.CharField(max_length=255, blank=True)
-    yelp_url = models.CharField(max_length=255, blank=True, validators=[URLValidator()])
-    foursquare_id = models.CharField(max_length=100, blank=True)
-    foursquare_url = models.CharField(max_length=255, blank=True, validators=[URLValidator()])
-
     categories = models.ManyToManyField(Category, null=True)
     avg_rating = models.DecimalField(max_digits=3, decimal_places=2, null=True, blank=True)
 
-    # User can make changes in this model,
-    # look at views.update_restaurant()
+    # Potentially User can make changes in this model
     modified_by = models.ForeignKey(User, null=True, blank=True)
     modified_on = models.DateTimeField(auto_now=True, null=True)
 
@@ -52,11 +48,14 @@ class Restaurant(models.Model):
     gis = gis_models.GeoManager()
     objects = models.Manager()
 
+    class Meta:
+        abstract = True
+
     def __unicode__(self):
         return self.name
 
     def update_avg_rating(self):
-        self_comments = Comment.objects.filter(restaurant = self)
+        self_comments = Comment.objects.filter(venue = self)
         num_of_comments = float(len(self_comments))
         if num_of_comments == 0.0:
             return
@@ -65,6 +64,21 @@ class Restaurant(models.Model):
             avg_rating += comment.rating / num_of_comments
         self.avg_rating = avg_rating
         self.save()
+
+
+class Restaurant(Venue):
+    cuisine = models.CharField(max_length = 50)
+    eatingOptions = models.CharField(max_length = 50)
+    yelp_id = models.CharField(max_length=255, blank=True)
+    yelp_url = models.CharField(max_length=255, blank=True, validators=[URLValidator()])
+    foursquare_id = models.CharField(max_length=100, blank=True)
+    foursquare_url = models.CharField(max_length=255, blank=True, validators=[URLValidator()])
+
+
+class Masjid(Venue):
+    url = models.CharField(max_length=255, blank=True, validators=[URLValidator()])
+    twitter_url = models.CharField(max_length=255, blank=True, validators=[URLValidator()])
+    facebook_url = models.CharField(max_length=255, blank=True, validators=[URLValidator()])
 
 
 class Comment(models.Model):
@@ -85,7 +99,7 @@ class Tip(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     modified_on = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User)
-    restaurant = models.ForeignKey(Restaurant)
+    venue = models.ForeignKey(Venue)
     text = models.TextField(max_length=200, blank=True)
 
     def __unicode__(self):

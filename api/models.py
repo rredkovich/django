@@ -4,6 +4,8 @@ from django.contrib.gis import geos
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator, URLValidator
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes import generic
 
 import datetime
 
@@ -55,7 +57,7 @@ class Venue(models.Model):
         return self.name
 
     def update_avg_rating(self):
-        self_comments = Comment.objects.filter(venue = self)
+        self_comments = Comment.objects.filter(venue_id = self.id)
         num_of_comments = float(len(self_comments))
         if num_of_comments == 0.0:
             return
@@ -82,12 +84,21 @@ class Masjid(Venue):
 
 
 class Comment(models.Model):
+    '''
+    This class uses generic ForeignKey, for details read here 
+    https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
+    '''
     created_on = models.DateTimeField(auto_now_add=True)
     modified_on = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User)
-    restaurant = models.ForeignKey(Restaurant)
+    content_type = models.ForeignKey(ContentType)
+    venue_id = models.PositiveIntegerField()
+    content_object = generic.GenericForeignKey('content_type', 'venue_id')
     rating = models.IntegerField(null=True, blank=True)
     text = models.TextField(blank=True)
+
+    def venue_name(self):
+        return self.content_object.name
 
     def __unicode__(self):
         return self.text[:25]
@@ -96,11 +107,20 @@ class Comment(models.Model):
         return self.__unicode__()
 
 class Tip(models.Model):
+    '''
+    This class uses generic ForeignKey, for details read here 
+    https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
+    '''
     created_on = models.DateTimeField(auto_now_add=True)
     modified_on = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User)
-    venue = models.ForeignKey(Venue)
+    content_type = models.ForeignKey(ContentType)
+    venue_id = models.PositiveIntegerField()
+    content_object = generic.GenericForeignKey('content_type', 'venue_id')
     text = models.TextField(max_length=200, blank=True)
 
     def __unicode__(self):
         return self.text[:25]
+
+    def venue_name(self):
+        return self.content_object.name

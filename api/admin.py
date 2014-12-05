@@ -1,22 +1,25 @@
 from django.contrib.gis import admin
 from api import models
 
-class RestaurantInOneLine(admin.GeoModelAdmin):
+class RestaurantAdmin(admin.GeoModelAdmin):
     list_display = ('name', 'id', 'phone', 'yelp_id', 'yelp_url','foursquare_id','foursquare_url', 'avg_rating')
 
-class CommentInOneLine(admin.ModelAdmin):
-    fields = (('restaurant', 'user'), 'rating', 'text')
-    list_display = ('restaurant', 'rating', 'short_text', 'user')
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('venue_name', 'rating', 'short_text', 'user')
+    fields = (('venue_name', 'user'), 'rating', 'text')
+    readonly_fields = ('venue_name',)
 
-class TipInOneLine(admin.ModelAdmin):
-    fields = (('restaurant', 'user'), 'text')
-    list_display = ('restaurant', 'text', 'user')
+class TipAdmin(admin.ModelAdmin):
+    list_display = ('venue_name', 'text', 'user')
+    fields = (('venue_name', 'user'), 'text')
+    readonly_fields = ('venue_name',)
 
-class CategoryInOneLine(admin.ModelAdmin):
+class CategoryAdmin(admin.ModelAdmin):
     list_display = ('name', 'id')
 
 # Register your models here.
-admin.site.register(models.Restaurant, RestaurantInOneLine)
-admin.site.register(models.Comment, CommentInOneLine)
-admin.site.register(models.Category, CategoryInOneLine)
-admin.site.register(models.Tip, TipInOneLine)
+admin.site.register(models.Restaurant, RestaurantAdmin)
+admin.site.register(models.Masjid, admin.GeoModelAdmin)
+admin.site.register(models.Comment, CommentAdmin)
+admin.site.register(models.Category, CategoryAdmin)
+admin.site.register(models.Tip, TipAdmin)

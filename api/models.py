@@ -4,6 +4,8 @@ from django.contrib.gis import geos
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator, URLValidator
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes import generic
 
 import datetime
 
@@ -14,7 +16,11 @@ class Category(models.Model):
     def __unicode__(self):
         return self.name
 
-class Restaurant(models.Model):
+
+class Venue(models.Model):
+    '''
+    General model for venues.
+    '''
     name = models.CharField(max_length = 100)
     address = models.CharField(max_length = 150)
     phone = models.CharField(
@@ -27,24 +33,16 @@ class Restaurant(models.Model):
                 )
             ]
     )
-    cuisine = models.CharField(max_length = 50)
-    eatingOptions = models.CharField(max_length = 50)
     location = gis_models.PointField(
         u'Latitude/Longitude', 
         geography=True, 
         blank=True, 
         null=True
     )
-    yelp_id = models.CharField(max_length=255, blank=True)
-    yelp_url = models.CharField(max_length=255, blank=True, validators=[URLValidator()])
-    foursquare_id = models.CharField(max_length=100, blank=True)
-    foursquare_url = models.CharField(max_length=255, blank=True, validators=[URLValidator()])
-
     categories = models.ManyToManyField(Category, null=True)
     avg_rating = models.DecimalField(max_digits=3, decimal_places=2, null=True, blank=True)
 
-    # User can make changes in this model,
-    # look at views.update_restaurant()
+    # Potentially User can make changes in this model
     modified_by = models.ForeignKey(User, null=True, blank=True)
     modified_on = models.DateTimeField(auto_now=True, null=True)
 
@@ -52,11 +50,14 @@ class Restaurant(models.Model):
     gis = gis_models.GeoManager()
     objects = models.Manager()
 
+    class Meta:
+        abstract = True
+
     def __unicode__(self):
         return self.name
 
     def update_avg_rating(self):
-        self_comments = Comment.objects.filter(restaurant = self)
+        self_comments = Comment.objects.filter(venue_id = self.id)
         num_of_comments = float(len(self_comments))
         if num_of_comments == 0.0:
             return
@@ -67,13 +68,37 @@ class Restaurant(models.Model):
         self.save()
 
 
+class Restaurant(Venue):
+    cuisine = models.CharField(max_length = 50)
+    eatingOptions = models.CharField(max_length = 50)
+    yelp_id = models.CharField(max_length=255, blank=True)
+    yelp_url = models.CharField(max_length=255, blank=True, validators=[URLValidator()])
+    foursquare_id = models.CharField(max_length=100, blank=True)
+    foursquare_url = models.CharField(max_length=255, blank=True, validators=[URLValidator()])
+
+
+class Masjid(Venue):
+    url = models.CharField(max_length=255, blank=True, validators=[URLValidator()])
+    twitter_url = models.CharField(max_length=255, blank=True, validators=[URLValidator()])
+    facebook_url = models.CharField(max_length=255, blank=True, validators=[URLValidator()])
+
+
 class Comment(models.Model):
+    '''
+    This class uses generic ForeignKey, for details read here 
+    https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
+    '''
     created_on = models.DateTimeField(auto_now_add=True)
     modified_on = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User)
-    restaurant = models.ForeignKey(Restaurant)
+    content_type = models.ForeignKey(ContentType)
+    venue_id = models.PositiveIntegerField()
+    content_object = generic.GenericForeignKey('content_type', 'venue_id')
     rating = models.IntegerField(null=True, blank=True)
     text = models.TextField(blank=True)
+
+    def venue_name(self):
+        return self.content_object.name
 
     def __unicode__(self):
         return self.text[:25]
@@ -82,11 +107,20 @@ class Comment(models.Model):
         return self.__unicode__()
 
 class Tip(models.Model):
+    '''
+    This class uses generic ForeignKey, for details read here 
+    https://docs.djangoproject.com/en/1.6/ref/contrib/contenttypes/#generic-relations
+    '''
     created_on = models.DateTimeField(auto_now_add=True)
     modified_on = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User)
-    restaurant = models.ForeignKey(Restaurant)
+    content_type = models.ForeignKey(ContentType)
+    venue_id = models.PositiveIntegerField()
+    content_object = generic.GenericForeignKey('content_type', 'venue_id')
     text = models.TextField(max_length=200, blank=True)
 
     def __unicode__(self):
         return self.text[:25]
+
+    def venue_name(self):
+        return self.content_object.name

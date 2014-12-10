@@ -152,7 +152,7 @@ def closest(request):
         else:
             venues = get_restaurants(lon, lat, categories)
             if not venues:
-                venues = get_restaurants(lon. lat, categories=[])
+                venues = get_restaurants(lon, lat, categories=[])
                 response_message = "No venues for this categories, here are some other ones you might like"
 
         return HttpResponse(

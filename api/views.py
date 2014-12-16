@@ -12,9 +12,74 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
 from social.apps.django_app.utils import psa
 from api import models, forms
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+from geopy.geocoders import Nominatim
+from urllib2 import URLError
 
 # from django.contrib.auth import logout
+def restaurants_lists(request):
+    form = forms.AddressForm()
+    restaurants = []
+    latitude=""
+    longitude=""
+    if request.POST:
+        form = forms.AddressForm(request.POST)
+        if form.is_valid():
+            address = form.cleaned_data['address']
+            category = form.cleaned_data['category']
 
+            list_of_cats = []
+            if category:
+                try:
+                    list_of_cats.append(models.Category.objects.get(name__icontains=category))
+                except (MultipleObjectsReturned):
+                    length = models.Category.objects.filter(name__icontains=category).__len__()
+                    for l in range(length):
+                        list_of_cats.append(models.Category.objects.filter(name__icontains=category)[l])
+                except (ObjectDoesNotExist):
+                    pass
+            if not address:
+                if list_of_cats:
+                    restaurants = models.Restaurant.objects.filter(categories__in=list_of_cats)
+                else:
+                    restaurants = models.Restaurant.objects.all
+            else:
+                geocoder = Nominatim()
+                location = geocoder.geocode(address)
+                if location:
+                    latitude= location.latitude
+                    longitude=location.longitude
+                    currentPoint = geos.GEOSGeometry('POINT(%s %s)' %(longitude, latitude))
+                    distance_m = {'km': 15}
+                    if list_of_cats:
+                        restaurants = models.Restaurant.gis.filter(
+                            location__distance_lte=(currentPoint, measure.D(**distance_m)), 
+                            categories__in=list_of_cats
+                            ).distance(currentPoint)
+                    else:
+                        restaurants = models.Restaurant.gis.filter(location__distance_lte=(currentPoint, measure.D(**distance_m))).distance(currentPoint)
+        context = {'all_restaurants': restaurants,'form': form,'longitude': longitude, 'latitude' : latitude}
+        return render(request, 'restaurantlist.html', context)
+    else:
+        context = {'all_restaurants': restaurants,'form': form,'longitude': longitude, 'latitude' : latitude}
+        return render(request, 'restaurants.html', context)
+
+
+def get_category(request):
+    if request.is_ajax():
+        cat = request.GET['term']
+        categories = models.Category.objects.filter(name__icontains = cat )[:20]
+        results = []
+        for category in categories:
+            cat_json = {}
+            cat_json['id'] = category.id
+            cat_json['value'] = category.name
+            results.append(cat_json)
+        data = json.dumps(results)
+    else:
+        data = 'fail'
+    mimetype = 'application/json'
+    return HttpResponse(data, mimetype)
 def get_restaurants(longitude, latitude, categories):
     '''
     Returns objects at given point that satisfy set of categories, 

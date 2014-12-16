@@ -53,6 +53,7 @@ INSTALLED_APPS = (
     'api',
     'south',
     'social.apps.django_app.default',
+    'bootstrap3',
     # pinax-account apps:
     "ppacc",
     "bootstrapform",
@@ -163,10 +164,16 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
+STATIC_PATH = os.path.join(BASE_DIR,'static')
+
 
 STATIC_ROOT = '/home/django/django_project/static'
 #STATIC_ROOT = ''
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = (
+    STATIC_PATH,
+)
 #STATICFILES_DIRS = ( os.path.join('static'),)
 #MEDIA_ROOT = '/home/django/django_project/static'
 

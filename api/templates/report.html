@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+<html>
+    <head>
+        <title>Report</title>
+    </head>
+    <body>
+        <form autocomplete="off" action="" method="post">{% csrf_token %}
+          <p></p>
+            <input type="radio" name="rating" value="1" required> Restaurant is closed (out of business)
+            <input type="radio" name="rating" value="2"> Is a duplicate
+            <input type="radio" name="rating" value="3"> Other
+          <textarea type="text" name="comment" placeholder="Type your report here" required></textarea>
+          <input type="submit" value="Submit"> 
+        </form>
+    </body>
+</html>

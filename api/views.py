@@ -1,10 +1,12 @@
 import json
-from django.shortcuts import render
+from django.conf import settings
+from django.shortcuts import render, redirect
 from django.core.context_processors import csrf
 from django.shortcuts import render_to_response
 from django.http import HttpResponse, Http404
 from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.gis import geos
 from django.contrib.gis import measure
 from geopy.distance import distance as geopy_distance
@@ -34,10 +36,14 @@ def get_restaurants(longitude, latitude, categories):
     if list_of_cats:
         restaurants = models.Restaurant.gis.filter(
             location__distance_lte=(currentPoint, distance_m), 
-            categories__in=list_of_cats
-            )
+            categories__in=list_of_cats,
+            is_closed=False
+        )
     else:
-        restaurants = models.Restaurant.gis.filter(location__distance_lte=(currentPoint, distance_m))
+        restaurants = models.Restaurant.gis.filter(
+            location__distance_lte=(currentPoint, distance_m),
+            is_closed=False
+        )
     
     # seems that this thing doesn't actually order objects by distance
     # btw at this step there is no distance property in objects or rows in table
@@ -174,7 +180,14 @@ def comment(request, rest_pk):
     rest_pk must be valid one for existing restaurant or 
     ValueError will be raised on save() attempt in POST part. 
     '''
-    context = {}
+    try:
+        rest = models.Restaurant.objects.get(id=rest_pk)
+    except ObjectDoesNotExist:
+        raise Http404
+    
+    context = {
+        'venue_name': rest.name
+    }
 
     if request.method == u'GET':
         try:
@@ -188,11 +201,6 @@ def comment(request, rest_pk):
 
 
     if request.method == u'POST':
-        try:
-            rest = models.Restaurant.objects.get(id=rest_pk)
-        except ObjectDoesNotExist:
-            raise Http404
-
         filterargs = { 'venue_id': rest_pk, 'user': request.user }
         try:
             comment = models.Comment.objects.get(**filterargs)
@@ -221,7 +229,14 @@ def tip(request, rest_pk):
     rest_pk must be valid one for existing restaurant or 
     ValueError will be raised on save() attempt in POST part. 
     '''
-    context = {}
+    try:
+        rest = models.Restaurant.objects.get(id=rest_pk)
+    except ObjectDoesNotExist:
+        raise Http404
+
+    context = {
+        'venue_name': rest.name
+    }
 
     if request.method == u'GET':
         try:
@@ -233,11 +248,6 @@ def tip(request, rest_pk):
 
 
     if request.method == u'POST':
-        try:
-            rest = models.Restaurant.objects.get(id=rest_pk)
-        except ObjectDoesNotExist:
-            raise Http404
-
         filterargs = { 'venue_id': rest_pk, 'user': request.user }
         try:
             tip = models.Tip.objects.get(**filterargs)
@@ -262,7 +272,10 @@ def show_all_tips(request, rest_pk):
 def update_restaurant(request, rest_pk):
     rest = models.Restaurant.objects.get(id=rest_pk)
 
-    context = {'rest_pk': rest_pk}
+    context = {
+        'venue_name': rest.name,
+        'rest_pk': rest_pk
+        }
 
     if request.method == 'POST':
         form = forms.RestaurantForm(request.POST, instance=rest) # A form bound to the POST data
@@ -276,6 +289,73 @@ def update_restaurant(request, rest_pk):
         context['form'] = forms.RestaurantForm(instance=rest)
 
     return render(request, 'update.html', context)
+
+def report_restaurant(request, rest_pk):
+    rest = models.Restaurant.objects.get(id=rest_pk)
+    context = {
+        'venue_name': rest.name
+    }
+    if request.method == 'GET':
+        context['form'] = forms.ReportForm()
+        return render(request, 'report.html', context)
+    
+    elif request.method == 'POST':
+        form = forms.ReportForm(request.POST)
+        if form.is_valid():
+            
+            user = None
+            if request.user.is_authenticated():
+                user = request.user
+            report = models.Report(
+                user=user,
+                content_object=rest,
+                report=form.cleaned_data['report'],
+                note=form.cleaned_data['note']
+            )
+            report.save()
+            if form.cleaned_data['report'] == u'closed':
+                rest.update_close_state()
+            context['is_saved'] = True
+        return render(request, 'report.html', context)
+    
+
+@login_required
+def moderate_reports(request):
+    if request.user.username not in settings.ALLOWED_TO_MODERATE:
+        return HttpResponse(status=500)
+
+    reports = models.Report.objects.all()
+    paginator = Paginator(
+        sorted(reports, key = lambda r: r.created_on, reverse=True), 
+        10
+    )
+    page = request.GET.get('page')
+    try:
+        context = {'reports': paginator.page(page)}
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        context = {'reports': paginator.page(1)}
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        context = {'reports':  paginator.page(paginator.num_pages)}
+
+    context.update(csrf(request))
+    return render(request, 'moderate_reports.html', context)
+
+def moderate_report(request, pk):
+    if request.method=='POST':
+        report = models.Report.objects.get(id=pk)
+        if 'moderator_flag' in request.POST:
+            report.moderator_flag = True
+        if 'moderator_note' in request.POST:
+            report.moderator_note = request.POST['moderator_note']
+        report.moderator = request.user
+        report.save()
+        return redirect(
+            '/moderate-reports/?page={n}'.format(
+                n=request.POST['page_num']
+            )
+        )
 
 # @login_required
 # def log_out(request):

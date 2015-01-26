@@ -32,6 +32,7 @@ python-social-auth==0.2.1
 # wsgiref==0.1.2
 # xattr==0.6.4
 south==1.0.0
+django-bootstrap>=5.1.0
 
 #Pinax-project-account section
 pinax-theme-bootstrap==5.5.1

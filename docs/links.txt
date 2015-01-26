@@ -21,6 +21,12 @@ restaurants/__rest_id__/show-all-tips/
 # Webpage link for make changes in a venue
 restaurants/__rest_id__/update/
 
+# Webpage link for reports
+restaurants/__rest_id__/reports
+# Moderating reports
+# !!! username should be in ALLOWED_TO_MODERATE which is un settings.py
+/moderate-reports
+
 # python-social-login urls
 # GET register-by-token/facebook/?access_token=__token__
 # returns sessionid cookie which should be used for future 

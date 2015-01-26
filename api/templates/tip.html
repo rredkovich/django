@@ -1,19 +1,23 @@
-<!DOCTYPE html>
-<meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-<html>
+{% extends "base.html" %}
+{% block html %}
     <head>
         <title>My Tip</title>
     </head>
     <body>
+      <div class="panel panel-default">
+      <div class="panel-body">
+      <h3>{{venue_name}}</h3>
         <form autocomplete="off" action="" method="post">{% csrf_token %}
-          <p></p>
-          <!-- <input type="hidden" name="restaurant" value=""> -->
-          <textarea type="text" name="tip" placeholder="Type your tip here">{{tip_text}}</textarea>
-          <br>
-          <input type="submit" value="Submit">
+        <div class="form-group">
+          <!-- <label for="tipArea">Tip</label> -->
+          <textarea class="form-control" id="tipArea" type="text" name="tip" placeholder="Type your tip here" required>{{tip_text}}</textarea>
+          </div>
+          <button type="submit" class="btn btn-default">Submit</button>
           {% if is_saved %}
-          <font color="green">&#10004;</font> Saved
+          <span class="label label-success">Saved</span>
           {% endif %}
         </form>
+      </div>
+      </div>
     </body>
-</html>
+{% endblock %}

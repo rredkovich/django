@@ -1,7 +1,18 @@
-<form action="/restaurants/{{rest_pk}}/update/" method="post">{% csrf_token %}
-{{ form.as_p }}
-<input type="submit" value="Submit" />
-{% if is_saved %}
-<font color="green">&#10004;</font> Saved
-{% endif %}
-</form>
+{% extends "base.html" %}
+{% load bootstrap3 %}
+{% block html %}
+    <div class="panel panel-default">
+    <div class="panel-body">
+        <h3>{{venue_name}}</h3>
+        <br>
+        <form action="/restaurants/{{rest_pk}}/update/" method="post" class="form">{% csrf_token %}
+            {% bootstrap_form form %}
+            {% buttons %}
+            <button type="submit" class="btn btn-default">Submit</button>
+              {% if is_saved %}
+              <span class="label label-success">Saved</span>
+              {% endif %}
+          {% endbuttons %}
+        </form>
+    </div>
+{% endblock %}

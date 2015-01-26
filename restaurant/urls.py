@@ -20,6 +20,9 @@ urlpatterns = patterns('',
     url(r'^restaurants/(?P<rest_pk>[0-9]+)/tip/$', views.tip),
     url(r'^restaurants/(?P<rest_pk>[0-9]+)/show-all-tips/$', views.show_all_tips),
     url(r'^restaurants/(?P<rest_pk>[0-9]+)/update/$', views.update_restaurant),
+    url(r'^restaurants/(?P<rest_pk>[0-9]+)/report/$', views.report_restaurant),
+    url(r'^moderate-reports/$', views.moderate_reports),
+    url(r'^reports/(?P<pk>[0-9]+)/moderate/$', views.moderate_report),
 
     #python-social-login urls
     url(r'', include('social.apps.django_app.urls', namespace='social')),

@@ -1,17 +1,24 @@
-<!DOCTYPE html>
-<meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-<html>
+{% extends "base.html" %}
+{% load bootstrap3 %}
+{% block html%}
     <head>
-        <title>Report</title>
+        <title>Report {{venue_name}}</title>
     </head>
     <body>
-        <form autocomplete="off" action="" method="post">{% csrf_token %}
-          <p></p>
-            <input type="radio" name="rating" value="1" required> Restaurant is closed (out of business)
-            <input type="radio" name="rating" value="2"> Is a duplicate
-            <input type="radio" name="rating" value="3"> Other
-          <textarea type="text" name="comment" placeholder="Type your report here" required></textarea>
-          <input type="submit" value="Submit"> 
+      <div class="panel panel-default">
+      <div class="panel-body">
+        <h3>{{venue_name}}</h3>
+        {% if is_saved %}
+            <span class="label label-success">Saved</span>
+        {% else %}
+        <form autocomplete="off" action="" method="post" class="from">{% csrf_token %}
+          {% bootstrap_form form %}
+          {% buttons %}
+          <button type="submit" class="btn btn-default">Submit</button>
+          {% endbuttons %}
         </form>
+        {% endif %}
     </body>
-</html>
+    </div>
+    </div>
+{% endblock %}

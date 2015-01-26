@@ -28,11 +28,11 @@ ALLOWED_HOSTS = ['*']
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 
-#TODO Change in production
-# SECURITY WARNING: keep the secret key used in production secret!
+#TODO: Change in production
+#TODO: SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '6+)idbqp^jvtw3q!*((=b)u9ba70)2p19#yoa4bc6zrvowl12r'
 
-# SECURITY WARNING: don't run with debug turned on in production!
+#TODO: SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 TEMPLATE_DEBUG = True
@@ -56,6 +56,7 @@ INSTALLED_APPS = (
     # pinax-account apps:
     "ppacc",
     "bootstrapform",
+    "bootstrap3",
     "pinax_theme_bootstrap",
     "account",
     "eventlog",
@@ -101,7 +102,7 @@ AUTHENTICATION_BACKENDS = (
 
 )
 
-#TODO Change in production
+#TODO: Change in production
 SOCIAL_AUTH_FACEBOOK_KEY = '338877252958705'
 SOCIAL_AUTH_FACEBOOK_SECRET = '104976a391991584da7dbd3fa192315f'
 
@@ -130,7 +131,7 @@ LOGIN_URL = '/login/facebook/'
 
 # SESSION_COOKIE_DOMAIN = "128.199.176.172"
 
-#TODO Change to actual smtp account for production
+#TODO: Change to actual smtp account for production
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'redkovich@gmail.com'
 EMAIL_HOST_PASSWORD = 'vkiofcumunkmixrj'
@@ -150,6 +151,9 @@ ACCOUNT_LOGIN_REDIRECT_URL = "home"
 ACCOUNT_LOGOUT_REDIRECT_URL = "home"
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 2
 
+# users, allowed to moderate customer reports
+ALLOWED_TO_MODERATE = ['rrn']
+
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -165,10 +169,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_ROOT = '/home/django/django_project/static'
-#STATIC_ROOT = ''
 STATIC_URL = '/static/'
-#STATICFILES_DIRS = ( os.path.join('static'),)
-#MEDIA_ROOT = '/home/django/django_project/static'
 
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, "/api/templates"),

@@ -22,10 +22,10 @@ restaurants/__rest_id__/show-all-tips/
 restaurants/__rest_id__/update/
 
 # Webpage link for reports
-restaurants/__rest_id__/reports
+restaurants/__rest_id__/report/
 # Moderating reports
 # !!! username should be in ALLOWED_TO_MODERATE which is un settings.py
-/moderate-reports
+/moderate-reports/
 
 # python-social-login urls
 # GET register-by-token/facebook/?access_token=__token__

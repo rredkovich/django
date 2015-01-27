@@ -152,7 +152,7 @@ ACCOUNT_LOGOUT_REDIRECT_URL = "home"
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 2
 
 # users, allowed to moderate customer reports
-ALLOWED_TO_MODERATE = ['rrn']
+ALLOWED_TO_MODERATE = ['rrn', 'mysoft']
 
 LANGUAGE_CODE = 'en-us'
 

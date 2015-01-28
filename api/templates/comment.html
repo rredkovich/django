@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 {% block title%}My Comment{% endblock%}
 {% block body %}
 <div class="panel panel-default">
@@ -8,7 +9,7 @@
       <label>Rating: </label>
       <div class="radio-inline">
         <label>
-          <input type="radio" name="rating" value="1"{% if rating == 1 %} checked {% endif %} required> 1
+          <input type="radio" name="rating" value="1" required {% if rating == 1 %} checked {% endif %} > 1
         </label>
       </div>
       <div class="radio-inline">
@@ -42,4 +43,13 @@
     </form>
   </div>
 </div>
+{% endblock %}
+{% block scripts%}
+<!-- Form validation for safari-->
+<script src="{% static "js/jquery.h5validate.js" %}"></script>
+<script>
+  $(document).ready(function () {
+      $('form').h5Validate();
+  });
+</script>
 {% endblock %}

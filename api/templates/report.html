@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load bootstrap3 %}
+{% load staticfiles %}
 {% block title%}Report {{venue_name}}{% endblock %}
 {% block body%}
 <div class="panel panel-default">
@@ -17,4 +18,13 @@
     {% endif %}
   </div>
 </div>
+{% endblock %}
+{% block scripts%}
+<!-- Form validation for mobile safari-->
+<script src="{% static "js/jquery.h5validate.js" %}"></script>
+<script>
+  $(document).ready(function () {
+      $('form').h5Validate();
+  });
+</script>
 {% endblock %}
